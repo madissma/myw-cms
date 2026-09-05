@@ -1,0 +1,31 @@
+{
+  "name": "szb-admin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "森芝宝官网内容管理后台 (Vue 3 + Vite + Element Plus)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "typecheck": "vue-tsc -b",
+    "preview": "vite preview --port 3002"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "@wangeditor/editor": "^5.1.23",
+    "axios": "^1.20.0",
+    "dayjs": "^1.11.23",
+    "element-plus": "^2.14.5",
+    "pinia": "^4.0.3",
+    "vue": "^3.5.42",
+    "vue-draggable-plus": "^0.6.1",
+    "vue-router": "^5.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue-tsc": "^3.3.11"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "szb-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "森芝宝官网内容管理后端 (NestJS + Prisma + SQLite)",
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "nest start",
+    "start:prod": "node dist/main",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:verify": "tsx scripts/verify-seed.mts",
+    "db:fallback": "tsx scripts/dump-app-fallback.mts",
+    "db:init": "prisma migrate deploy && prisma db seed && pnpm db:verify",
+    "db:reset": "prisma migrate reset --force && prisma db seed && pnpm db:verify",
+    "extract:site": "tsx scripts/extract-from-app.mts",
+    "extract:pages": "tsx scripts/extract-page-constants.mts",
+    "dump:fixtures": "tsx scripts/dump-to-fixtures.mts",
+    "migrate:data": "tsx scripts/migrate-data.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "comment:multer": "media.storage.ts 直接调 diskStorage，必须自己声明而不是搭 @nestjs/platform-express 的传递依赖（pnpm 严格作不起来）",
+  "dependencies": {
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/jwt": "^12.0.1",
+    "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/serve-static": "^12.0.0",
+    "@nestjs/swagger": "^12.0.1",
+    "@prisma/client": "^6.9.0",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "helmet": "^8.3.0",
+    "joi": "^18.2.8",
+    "multer": "^2.2.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "sanitize-html": "^2.17.7"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/schematics": "^12.0.0",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
+    "@types/node": "catalog:",
+    "@types/sanitize-html": "^2.13.0",
+    "prisma": "^6.9.0",
+    "ts-morph": "^28.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.13",
+    "typescript": "~6.0.3"
+  }
+}

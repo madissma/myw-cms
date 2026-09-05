@@ -1,0 +1,17 @@
+node_modules/
+dist/
+# 本地数据库与上传件：内容不入库，但用 /* 而非 / 排除，
+# 否则 git 不会进入已排除目录，下面的 .gitkeep 反选会失效（曾因此导致目录占位从未入仓）。
+data/*
+!data/.gitkeep
+storage/uploads/*
+!storage/uploads/.gitkeep
+prisma/seed-report.md
+# 反向导出物：一次性产物，需要评审时临时生成，不入仓
+prisma/fixtures/dump/
+*.log
+# 真实环境文件含 JWT_SECRET 与 SEED_ADMIN_PASSWORD，绝不入库；
+# .env.example 是模板，需要跟着仓库分发
+.env
+.env.local
+.DS_Store

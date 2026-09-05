@@ -1,0 +1,35 @@
+# workspace 根的忽略项：node_modules/ 这类模式会递归作用于全部子工程
+node_modules/
+.pnpm-store/
+*.log
+npm-debug.log*
+*.tsbuildinfo
+.DS_Store
+
+# 构建产物兜底：admin / server 已有各自的 .gitignore，app 没有；
+# 这里再写一遍是为了日后新增工程时不会漏配
+apps/app/dist/
+apps/app/dist-ssr/
+apps/admin/dist/
+apps/server/dist/
+
+# 环境变量：真实 .env 含 JWT 密钥与管理员初始化口令，一律不入库。
+# 这是一条跨工程的兜底防线（server 工程内又显式声明了一份）；
+# 已验证：.env.example 不匹配以上任何一条，无需反选就能入库。
+.env
+.env.local
+.env.*.local
+
+# SQLite 数据文件（含 WAL / SHM  sidecar），由 prisma db:init / migrate 在本地生成。
+# 具体目录的 .gitkeep 保留规则写在 apps/server/.gitignore 里：
+# 子工程文件已用 data/ 形式排除了目录本身，git 不会进入已排除目录，
+# 在根文件里写 ! 反选是无效的（实测 check-ignore 仍指向子文件的 data/）。
+*.db
+*.db-wal
+*.db-shm
+
+# 本地覆盖：包管理配置的个人改动
+.npmrc.local
+
+# 本地产物：验收截图与旧锁备份（.artifacts/lock-backup/），不随仓库分发
+.artifacts/

@@ -1,0 +1,453 @@
+// 森芝宝官网 CMS —— 数据模型
+// 跨库可迁移性硬约束（详见规划第 4 / 9 节）：
+//   1. 不使用 Prisma enum（SQLite 不支持），状态一律 Int
+//   2. 主键统一 cuid 字符串，不使用自增整型
+//   3. 关系显式声明 onDelete，手工补 @@index
+//   4. 长文本用无原生注解的 String（迁移 MySQL 时再补 @db.Text）
+//   5. Json 字段仅整取整存，不参与 where 过滤
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== 用户与组织 ====================
+
+model User {
+  id           String     @id @default(cuid())
+  username     String     @unique
+  passwordHash String
+  name         String
+  email        String?
+  phone        String?
+  avatar       String?
+  remark       String?
+  status       Int        @default(1)
+  orgId        String?
+  org          Org?       @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  roles        UserRole[]
+  lastLoginAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([orgId])
+  @@index([status])
+}
+
+model Org {
+  id        String  @id @default(cuid())
+  parentId  String?
+  parent    Org?    @relation("OrgTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Org[]   @relation("OrgTree")
+  name      String
+  code      String? @unique
+  leader    String?
+  phone     String?
+  sortOrder Int     @default(0)
+  status    Int     @default(1)
+  users     User[]
+
+  @@index([parentId, sortOrder])
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  name        String
+  remark      String?
+  sortOrder   Int              @default(0)
+  status      Int              @default(1)
+  permissions RolePermission[]
+  users       UserRole[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id    String           @id @default(cuid())
+  key   String           @unique
+  name  String
+  group String
+  roles RolePermission[]
+
+  @@index([group])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model OperationLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  username  String?
+  action    String
+  target    String
+  ip        String?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+}
+
+// ==================== 栏目与分类 ====================
+
+model NavMenu {
+  id        String    @id @default(cuid())
+  parentId  String?
+  parent    NavMenu?  @relation("NavTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  NavMenu[] @relation("NavTree")
+  position  String    @default("header")
+  navKey    String?   @unique
+  label     String
+  labelEn   String?
+  path      String
+  icon      String?
+  target    String    @default("_self")
+  sortOrder Int       @default(0)
+  status    Int       @default(1)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([position, sortOrder])
+  @@index([parentId])
+}
+
+model Taxonomy {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  remark    String?
+  sortOrder Int      @default(0)
+  terms     Term[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Term {
+  id         String   @id @default(cuid())
+  taxonomyId String
+  taxonomy   Taxonomy @relation(fields: [taxonomyId], references: [id], onDelete: Cascade)
+  slug       String
+  name       String
+  nameEn     String?
+  anchor     String?
+  url        String?
+  image      String?
+  remark     String?
+  sortOrder  Int      @default(0)
+  status     Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([taxonomyId, slug])
+  @@index([taxonomyId, sortOrder])
+}
+
+// ==================== 结构化内容 ====================
+
+model Product {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  legacyId       String?  @unique
+  name           String
+  nameEn         String?
+  categorySlug   String
+  tag            String?
+  tagline        String?
+  summary        String?
+  description    String?
+  image          String?
+  images         Json?
+  params         Json?
+  certs          Json?
+  features       Json?
+  audiences      Json?
+  spec           String?
+  usage          String?
+  shopUrl        String?
+  isFeatured     Boolean  @default(false)
+  isHot          Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  status         Int      @default(1)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoKeywords    String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([categorySlug, status, sortOrder])
+  @@index([status, sortOrder])
+}
+
+model News {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  legacyId       String?   @unique
+  title          String
+  categorySlug   String
+  summary        String?
+  paragraphs     Json?
+  bodyHtml       String?
+  cover          String?
+  author         String?
+  source         String?
+  views          Int       @default(0)
+  isTop          Boolean   @default(false)
+  publishedAt    DateTime?
+  sortOrder      Int       @default(0)
+  status         Int       @default(1)
+  seoTitle       String?
+  seoKeywords    String?
+  seoDescription String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([categorySlug, status, publishedAt])
+  @@index([status, publishedAt])
+}
+
+model Video {
+  id           String   @id @default(cuid())
+  code         String?  @unique
+  title        String
+  duration     String?
+  description  String?
+  poster       String?
+  url          String?
+  categorySlug String?
+  sortOrder    Int      @default(0)
+  status       Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status, sortOrder])
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  code         String?  @unique
+  customerName String
+  location     String?
+  role         String?
+  product      String?
+  content      String
+  avatar       String?
+  rating       Int?
+  isAuthorized Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  status       Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status, sortOrder])
+}
+
+model Honor {
+  id        String   @id @default(cuid())
+  code      String?  @unique
+  name      String
+  issuer    String?
+  year      String?
+  image     String?
+  certNo    String?
+  sortOrder Int      @default(0)
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, sortOrder])
+}
+
+model TimelineEvent {
+  id        String   @id @default(cuid())
+  code      String?  @unique
+  year      String
+  eventDate String?
+  title     String?
+  content   String
+  sortOrder Int      @default(0)
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, sortOrder])
+}
+
+// ==================== 页面装修 ====================
+
+model Page {
+  id             String    @id @default(cuid())
+  key            String    @unique
+  name           String
+  path           String
+  heroTitle      String?
+  heroSubtitle   String?
+  heroEn         String?
+  heroImage      String?
+  body           String?
+  status         Int       @default(1)
+  seoTitle       String?
+  seoKeywords    String?
+  seoDescription String?
+  publishedAt    DateTime?
+  sections       Section[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+}
+
+model Section {
+  id           String   @id @default(cuid())
+  pageId       String
+  page         Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  anchor       String
+  label        String
+  eyebrow      String?
+  title        String?
+  subtitle     String?
+  variant      String?
+  showInSubNav Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  status       Int      @default(1)
+  blocks       Block[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([pageId, anchor])
+  @@index([pageId, sortOrder])
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  sectionId String
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  code      String
+  type      String
+  title     String?
+  props     Json
+  source    String?
+  query     Json?
+  columns   Int?
+  theme     Json?
+  sortOrder Int      @default(0)
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sectionId, code])
+  @@index([sectionId, sortOrder])
+}
+
+// ==================== 站点配置 / 主题 / 语言 ====================
+
+model Setting {
+  id        String   @id @default(cuid())
+  group     String
+  key       String   @unique
+  value     Json
+  type      String   @default("text")
+  label     String
+  remark    String?
+  options   Json?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([group, sortOrder])
+}
+
+model Theme {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  tokens    Json
+  isDefault Boolean  @default(false)
+  active    Boolean  @default(false)
+  preview   String?
+  remark    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Locale {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  name       String
+  nativeName String
+  isDefault  Boolean  @default(false)
+  active     Boolean  @default(false)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Translation {
+  id       String @id @default(cuid())
+  locale   String
+  entity   String
+  entityId String
+  field    String
+  value    String
+
+  @@unique([locale, entity, entityId, field])
+  @@index([entity, entityId])
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  url       String   @unique
+  name      String
+  mime      String?
+  size      Int?
+  width     Int?
+  height    Int?
+  alt       String?
+  folder    String?
+  usedBy    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([folder, createdAt])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  type      String?
+  content   String
+  status    Int      @default(0)
+  reply     String?
+  ip        String?
+  userAgent String?
+  handlerId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+}

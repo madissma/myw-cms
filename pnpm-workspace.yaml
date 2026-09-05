@@ -1,0 +1,37 @@
+# 三个工程组成一个 pnpm workspace，统一放在 apps/ 下；包管理已收敛到根目录。
+# 依赖清单仍由各工程自己维护，这里只收敛跨工程共用的版本号。
+packages:
+  - apps/*
+
+# pnpm 11.x 的安装脚本授权表（包名 -> 布尔）。pnpm 对值做严格比对：
+# true 加入允许集、false 加入禁止集，其他值（包括字符串）一律落空不生效。
+# 这里用显式布尔把「放行什么 / 屏蔽什么」写成机器约束，而不是只靠注释：
+#   prisma / @prisma/client / @prisma/engines —— 生成默认 client 与链接查询引擎，不放行则连不上库
+#   esbuild —— 校验并链接平台二进制，vite 与 tsx 都依赖它
+#   @scarf/scarf（装完发遥测请求）、es5-ext（postinstall 仅打印赞助信息）—— 显式置 false 主动屏蔽
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  '@scarf/scarf': false
+  es5-ext: false
+
+# 共用依赖的唯一版本来源：子工程里写 "catalog:" 即取这里的值。
+# 迁移前实测三处实际落盘版本一致（@types/node 24.13.3 / vite 7.3.6 / typescript 5.9.3），
+# 因此这里的区间与现状零漂移。server 的 typescript 是 ~6.0.3（配 Nest 12 已验证），不入 catalog，保持写死。
+catalog:
+  '@types/node': ^24.10.1
+  vite: ^7.3.6
+  typescript: ~5.9.3
+
+# pnpm 10+ 默认不执行依赖的安装脚本，需逐个白名单。这里放行的是功能必需项：
+#   prisma / @prisma/client / @prisma/engines —— 生成默认 client 与链接查询引擎，不放行则连不上库
+#   esbuild —— 校验并链接平台二进制，vite 与 tsx 都依赖它
+# 故意不放行的两个：@scarf/scarf（装完发遥测请求）、es5-ext（postinstall 仅打印赞助信息）。
+# 这是严格模式白送的一项收益：依赖的安装脚本从「默认全跑」变成「显式授权」。
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - esbuild
+  - prisma

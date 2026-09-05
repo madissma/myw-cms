@@ -1,0 +1,28 @@
+{
+  "name": "szb-cms",
+  "private": true,
+  "version": "1.0.0",
+  "description": "森芝宝官网内容管理系统：apps/app 前台 / apps/admin 后台 / apps/server 接口，pnpm workspace",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter ./apps/server --filter ./apps/admin --filter ./apps/app dev",
+    "dev:server": "pnpm --filter ./apps/server dev",
+    "dev:admin": "pnpm --filter ./apps/admin dev",
+    "dev:app": "pnpm --filter ./apps/app dev",
+    "build": "pnpm --filter ./apps/server build && pnpm --filter ./apps/admin build && pnpm --filter ./apps/app build",
+    "typecheck": "pnpm --filter ./apps/server typecheck && pnpm --filter ./apps/admin typecheck",
+    "start:prod": "pnpm --filter ./apps/server start:prod",
+    "prisma:generate": "pnpm --filter ./apps/server prisma:generate",
+    "db:init": "pnpm --filter ./apps/server db:init",
+    "db:seed": "pnpm --filter ./apps/server db:seed",
+    "db:verify": "pnpm --filter ./apps/server db:verify",
+    "db:fallback": "pnpm --filter ./apps/server db:fallback",
+    "db:reset": "pnpm --filter ./apps/server db:reset",
+    "extract:site": "pnpm --filter ./apps/server extract:site",
+    "extract:pages": "pnpm --filter ./apps/server extract:pages",
+    "dump:fixtures": "pnpm --filter ./apps/server dump:fixtures"
+  }
+}
