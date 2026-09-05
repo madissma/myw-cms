@@ -22,7 +22,7 @@
 | `pnpm-workspace.yaml` | 成员声明（`apps/*`）+ `catalog` 共用版本区间 + `allowBuilds` / `onlyBuiltDependencies` 安装脚本授权 |
 | `package.json` | 根清单：不带依赖，只放聚合脚本（均用 `--filter ./apps/<工程>` 定位成员） |
 | `.npmrc` | `node-linker=isolated`（严格布局）、`strict-peer-dependencies=false`、`auto-install-peers=true` |
-| `.gitignore` | 根级 `node_modules/` 递归作用于三个子工程，并兜住 `apps/app/dist` |
+| `.gitignore` | 根级 `node_modules/` 递归作用于三个子工程；`apps/server/.env`（含 JWT 密钥与管理员口令）、SQLite 数据文件、构建产物与 `.artifacts/` 均不入库，`apps/server/.gitignore` 另管 `data/` 与 `storage/uploads/` 的目录占位 |
 
 registry 不写进仓库，沿用用户级 `~/.npmrc`（本机为内网 Nexus）；换环境只改那一处。
 
