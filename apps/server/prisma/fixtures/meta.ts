@@ -85,6 +85,36 @@ export const THEMES: ThemeSeed[] = [
       radius: '0rem',
     },
   },
+  {
+    code: 'crimson-gold',
+    name: '朱金（#B02727）',
+    isDefault: false,
+    active: false,
+    remark:
+      '以 #B02727 为 forest 推导的暖色系：深红做暗底、米白偏暖、墨色带红调。金色刻意提亮——前台 CTA 与导航 logo 徽标是「金底红字」，金色压暗红字就会糊。',
+    tokens: {
+      color: {
+        cream: '#F9F5F1',
+        creamDeep: '#F0E8E0',
+        creamDark: '#E4D6CD',
+        forest: '#B02727',
+        forestDeep: '#671419',
+        forestLight: '#BE4037',
+        forestMist: '#BC6B62',
+        gold: '#D6A651',
+        goldLight: '#E0B767',
+        goldPale: '#EFE0BE',
+        ink: '#241E1E',
+        inkSoft: '#534646',
+      },
+      font: {
+        serif: '"Noto Serif SC", "Songti SC", SimSun, serif',
+        sans: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+        latin: '"Cormorant Garamond", "Noto Serif SC", serif',
+      },
+      radius: '0rem',
+    },
+  },
 ]
 
 // ==================== 语言 ====================
