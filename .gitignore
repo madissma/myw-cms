@@ -33,3 +33,7 @@ apps/server/dist/
 
 # 本地产物：验收截图与旧锁备份（.artifacts/lock-backup/），不随仓库分发
 .artifacts/
+
+# 上传时暂存在仓库根的素材源件；正式副本在 storage/uploads 并已登记进素材库。
+# 前导斜杠把它锚定在仓库根，不会误伤 apps/app/public/images 下的同名文件。
+/logo.png

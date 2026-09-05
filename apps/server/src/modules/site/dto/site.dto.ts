@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsDefined,
@@ -100,8 +101,13 @@ export class BulkSettingItemDto {
 }
 
 export class BulkSettingDto {
+  /**
+   * 限的是「单次提交项数」。先前写的是 @MaxLength(200, { each: true })，
+   * 那是「每个元素必须是长度 ≤ 200 的字符串」，而元素是 { key, value } 对象，
+   * class-validator 对非字符串一律判失败 —— 整个端点无论传什么都返回 400。
+   */
   @IsArray()
-  @MaxLength(200, { each: true })
+  @ArrayMaxSize(200, { message: '单次最多提交 200 项配置' })
   items: BulkSettingItemDto[];
 }
 
@@ -238,8 +244,9 @@ export class UpsertTranslationDto {
 }
 
 export class BulkTranslationDto {
+  /** 同上：限项数用 ArrayMaxSize，不能用 MaxLength 的 each 形式 */
   @IsArray()
-  @MaxLength(500, { each: true })
+  @ArrayMaxSize(500, { message: '单次最多提交 500 条译文' })
   items: UpsertTranslationDto[];
 }
 
