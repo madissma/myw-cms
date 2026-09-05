@@ -6,12 +6,21 @@ import { CreateThemeDto, UpdateThemeDto } from './dto/site.dto';
 /** 主题 token 的规范结构：仅这些分组会被前台 applyTheme 消费 */
 const TOKEN_GROUPS = ['color', 'font', 'radius', 'shadow'];
 
+/** radius 是标量分组（applyTheme 直接把它写进 --radius），其余分组是对象 */
+const SCALAR_GROUPS = new Set(['radius']);
+
 function normalizeTokens(input: unknown): Record<string, any> {
   const src = readJsonObject<Record<string, any>>(input, {});
   const out: Record<string, any> = {};
   for (const group of TOKEN_GROUPS) {
     const value = src[group];
-    if (value && typeof value === 'object' && !Array.isArray(value)) out[group] = value;
+    // 早先这里只放行「对象型」分组，于是字符串型的 radius 在任何一次后台保存中都被静默丢掉，
+    // 表现是「圆角填了不生效、卡片上圆角显示为 -」。
+    if (SCALAR_GROUPS.has(group)) {
+      if (typeof value === 'string' && value.trim()) out[group] = value.trim();
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+      out[group] = value;
+    }
   }
   if (!out.color) throw new BadRequestException('主题必须包含 color 分组');
   return out;
