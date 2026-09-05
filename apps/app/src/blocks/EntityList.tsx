@@ -218,7 +218,6 @@ export default function EntityList({ block, tone, appearance }: BlockComponentPr
                     alt={title}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-forest-deep/40 transition-colors duration-500 group-hover:bg-forest-deep/20" />
                   <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/60 bg-forest-deep/50 text-cream backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:border-gold group-hover:text-gold-light">
                     <Play className="ml-0.5 h-5 w-5" />
                   </span>

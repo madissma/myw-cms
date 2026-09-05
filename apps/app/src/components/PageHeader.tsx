@@ -22,11 +22,10 @@ export default function PageHeader({ page, image }: PageHeaderProps) {
 
   return (
     <section className="relative flex min-h-[420px] items-end overflow-hidden bg-forest-deep md:min-h-[520px]">
-      {/* background image with dark green gradient overlay */}
+      {/* 页头照片保持本色：不叠品牌色渐变遮罩，也不压暗（早先 opacity-55 会把照片融进底色的深红） */}
       {background ? (
-        <img src={background} alt="" className="absolute inset-0 h-full w-full object-cover opacity-55" />
+        <img src={background} alt="" className="absolute inset-0 h-full w-full object-cover" />
       ) : null}
-      <div className="absolute inset-0 bg-gradient-to-t from-forest-deep via-forest-deep/40 to-forest-deep/30" />
 
       {/* decorative outline text */}
       <span className="text-outline pointer-events-none absolute -right-6 top-16 hidden select-none font-serif-sc text-[9rem] leading-none lg:block">

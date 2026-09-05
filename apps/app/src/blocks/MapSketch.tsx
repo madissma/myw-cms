@@ -26,7 +26,7 @@ export default function MapSketch({ block }: BlockComponentProps) {
     <Reveal delay={120}>
       <div className="relative aspect-[16/7] overflow-hidden border border-cream/10 bg-forest">
         {image ? (
-          <img src={image} alt={marker} className="h-full w-full object-cover opacity-60" />
+          <img src={image} alt={marker} className="h-full w-full object-cover" />
         ) : (
           <>
             {/* stylized map */}

@@ -37,8 +37,6 @@ export default function HeroSlider({ block }: BlockComponentProps) {
             className={`absolute inset-0 transition-opacity duration-1000 ${i === index ? 'opacity-100' : 'opacity-0'}`}
           >
             {image && <img src={image} alt={title} className={`h-full w-full object-cover ${i === index ? 'kenburns' : ''}`} />}
-            <div className="absolute inset-0 bg-gradient-to-r from-forest-deep/85 via-forest-deep/45 to-forest-deep/20" />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/80 via-transparent to-forest-deep/30" />
           </div>
         )
       })}
